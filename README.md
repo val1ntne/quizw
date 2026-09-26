@@ -33,3 +33,15 @@ Phông Be Vietnam Pro tải từ Google Fonts khi có mạng. Con trỏ bút lô
 
 Hướng dẫn chính thức:
 https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
+
+
+## Video mèo
+
+Đặt video có tên chính xác `cat.mp4` cạnh `index.html` ở thư mục gốc.
+Tệp video chưa được cung cấp nên không nằm trong gói này. Sau khi thêm video,
+trình phát dưới ô chữ sẽ phát tệp đó bằng các nút điều khiển của trình duyệt.
+
+## Giao diện mới
+
+Tông đỏ và trắng, các khối nền đặc, không có ảnh Yangyang hoặc hiệu ứng kính.
+Dấu chân mèo thay lông vũ; con trỏ chuột dùng hình bàn chân mèo.

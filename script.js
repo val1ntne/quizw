@@ -1,4 +1,4 @@
-import {initFeatherEffects, featherBurst, completionFeathers} from './effects.mjs';
+import {initPawEffects, pawStamp} from './effects.mjs';
 import {questions, columns, keyColumn, keywordDisplay, normalize, newGame, solve, nextUnsolved, unlockedKeyword} from './puzzle.mjs';
 const $ = selector => document.querySelector(selector);
 let game = newGame();
@@ -21,13 +21,12 @@ function openDialog(dialog) {
  dialog.showModal();
  motion(dialog, [{opacity:0,transform:'translateY(12px) scale(.985)'},{opacity:1,transform:'translateY(0) scale(1)'}], {duration:360});
  if (dialog.id === 'complete-dialog') {
-  completionFeathers(dialog, reducedMotion.matches);
   dialog.querySelectorAll('.result-letters span').forEach((letter,i) => motion(letter,[{opacity:0,transform:'translateY(9px)'},{opacity:1,transform:'translateY(0)'}],{duration:420,delay:160+i*70,fill:'backwards'}));
  }
 }
 function celebrateRow(index) {
- featherBurst(grid.children[index].querySelector('.key-cell'), reducedMotion.matches);
- grid.children[index].querySelectorAll('.letter').forEach((letter,i) => motion(letter,[{transform:'translateY(0)',boxShadow:'0 0 0 0 #70c8e500'},{transform:'translateY(-3px)',boxShadow:'0 4px 16px 0 #70c8e54d'},{transform:'translateY(0)',boxShadow:'0 0 0 0 #70c8e500'}],{duration:460,delay:i*30}));
+ pawStamp(grid.children[index].querySelector('.key-cell'), reducedMotion.matches);
+ grid.children[index].querySelectorAll('.letter').forEach((letter,i) => motion(letter,[{transform:'translateY(0)',boxShadow:'0 0 0 0 #b4233200'},{transform:'translateY(-3px)',boxShadow:'0 4px 16px 0 #b4233220'},{transform:'translateY(0)',boxShadow:'0 0 0 0 #b4233200'}],{duration:460,delay:i*30}));
 }
 
 
@@ -92,8 +91,8 @@ function renderProgress(){
  $('#keyword-box').classList.toggle('unlocked',complete);
  $('#keyword-preview').textContent=complete?keywordDisplay:'· · · · · · ·';
  $('#keyword-preview').setAttribute('aria-label',complete?`Từ khóa: ${keywordDisplay}`:'Từ khóa chưa được mở');
- $('#keyword-note').textContent=complete?'Đọc cột xanh từ trên xuống.':`Hoàn thành cả 7 hàng ngang để mở khóa. Còn ${questions.length-count} hàng.`;
- $('#keyword-box .keyword-icon use').setAttribute('href',complete?'#feather':'#lock');
+ $('#keyword-note').textContent=complete?'Đọc cột đỏ từ trên xuống.':`Hoàn thành cả 7 hàng ngang để mở khóa. Còn ${questions.length-count} hàng.`;
+ $('#keyword-box .keyword-icon use').setAttribute('href',complete?'#check':'#lock');
 }
 function render(){makeBoard();renderQuestion();renderProgress();}
 function selectQuestion(index,focus){const changed=game.active!==index;game.active=index;render();if(changed)motion($('.question-content'),[{opacity:.35,transform:'translateY(7px)'},{opacity:1,transform:'translateY(0)'}],{duration:250});if(focus){if(game.solved[index])$('#question-title').focus({preventScroll:true});else input.focus({preventScroll:true});}}
@@ -128,20 +127,22 @@ const sourceGroups=new Map();questions.forEach((q,i)=>{if(!sourceGroups.has(q.so
 sourceGroups.forEach(s=>{const li=document.createElement('li'),a=document.createElement('a'),note=document.createElement('small');a.href=s.source;a.textContent=`${s.sourceName} ↗`;a.target='_blank';a.rel='noopener noreferrer';note.textContent=`Tham khảo cho câu ${s.numbers.join(', ')}`;li.append(a,note);sourceList.append(li);});
 render();
 
-const art = $('.scenery');
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
-let pointerFrame = 0;
-window.addEventListener('pointermove',event=>{
- if(reducedMotion.matches || !finePointer.matches || pointerFrame)return;
- const x=(event.clientX/window.innerWidth-.5)*9;
- const y=(event.clientY/window.innerHeight-.5)*5;
- pointerFrame=requestAnimationFrame(()=>{art.style.setProperty('--drift-x',`${x}px`);art.style.setProperty('--drift-y',`${y}px`);pointerFrame=0;});
-},{passive:true});
+initPawEffects(reducedMotion, finePointer);
 reducedMotion.addEventListener('change',()=>{
- if(reducedMotion.matches){
-  document.getAnimations().forEach(animation=>animation.cancel());
-  art.style.setProperty('--drift-x','0px');art.style.setProperty('--drift-y','0px');
- }
+ if(reducedMotion.matches) document.getAnimations().forEach(animation=>animation.cancel());
 });
-
-initFeatherEffects(reducedMotion, finePointer);
+const video = $('#cat-video');
+function videoUnavailable(){
+ video.hidden=true;
+ $('#video-empty').hidden=false;
+ $('#video-status').hidden=false;
+}
+video.addEventListener('error',videoUnavailable);
+video.querySelector('source').addEventListener('error',videoUnavailable);
+video.addEventListener('loadedmetadata',()=>{
+ video.hidden=false;
+ $('#video-empty').hidden=true;
+ $('#video-status').hidden=true;
+});
+if(video.error || video.networkState===3) videoUnavailable();
